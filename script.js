@@ -49,7 +49,7 @@ function doctorLogin(){
   document.getElementById('welcomePage').style.display='none';
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('doctorPage').classList.remove('hidden');
-  document.getElementById('doctorPageName').innerText=cleanName(sel);
+  document.getElementById('doctorPageName').innerText=cleanName(sel).replace(/^Dr\.\s*/i,'');
   currentDoctorName=sel;
   renderDoctorPage();
   history.pushState({page:"doctor"}, "", "#doctor");
