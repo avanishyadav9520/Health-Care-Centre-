@@ -1,6 +1,9 @@
 function hide(id){
   document.getElementById(id).classList.add('hidden')
 }
+function cleanName(n){
+  return n.replace(/^(Dr\.\s*)+/gi,' ').trim();
+}
 const UPI="9520933721@ptyes";
 const _0xA1="QXZhbmlzaCBZYWRhdg==";
 const _0xB2="MjMwNTMwMTAxMDM4";
