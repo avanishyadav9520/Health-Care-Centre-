@@ -1,6 +1,7 @@
 function hide(id){
   document.getElementById(id).classList.add('hidden')
 }
+
 function cleanName(n){
   return n.replace(/^(Dr\.\s*)+/gi,' ').trim();
 }
@@ -48,7 +49,7 @@ function doctorLogin(){
   document.getElementById('welcomePage').style.display='none';
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('doctorPage').classList.remove('hidden');
-  document.getElementById('doctorPageName').innerText=sel;
+  document.getElementById('doctorPageName').innerText=cleanName(sel);
   currentDoctorName=sel;
   renderDoctorPage();
   history.pushState({page:"doctor"}, "", "#doctor");
@@ -84,7 +85,7 @@ function patientLogin(){
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('homePage').classList.remove('hidden');
   document.getElementById('showName').innerText=n;
-  document.getElementById('doctorContainer').innerHTML=doctors.map((d,i)=>`<div class="doc-card"><div style="font-size:26px">${d.icon}</div><h4 style="font-size:12px;margin:4px 0">${d.name}</h4><div style="margin:3px 0">${getStatus(d.status)}</div><small style="font-size:9px">${d.dept}<br>${d.age}<br>${d.exp}<br><b>${d.fees}</b></small><br><button class="btn" style="padding:6px;font-size:10px;background:#10b981;margin-top:5px" onclick="openBook(${i})">Book</button></div>`).join('');
+  document.getElementById('doctorContainer').innerHTML=doctors.map((d,i)=>`<div class="doc-card"><div style="font-size:26px">${d.icon}</div><h4 style="font-size:12px;margin:4px 0">${cleanName(d.name)}</h4><div style="margin:3px 0">${getStatus(d.status)}</div><small style="font-size:9px">${d.dept}<br>${d.age}<br>${d.exp}<br><b>${d.fees}</b></small><br><button class="btn" style="padding:6px;font-size:10px;background:#10b981;margin-top:5px" onclick="openBook(${i})">Book</button></div>`).join('');
   document.getElementById('labContainer').innerHTML=labTests.map((l,i)=>`<div class="lab-card"><div style="font-size:24px">${l.icon}</div><h4 style="font-size:11px">${l.name}</h4><small style="font-size:9px">${l.price} | ${l.time}</small><br><button class="btn" style="padding:5px;font-size:10px;background:orange;margin-top:5px" onclick="openLab(${i})">Book Test</button></div>`).join('');
   renderHistory();renderLabHistory();renderMedicalHistory();
   history.pushState({page:"home"}, "", "#home");
@@ -93,10 +94,10 @@ function renderAdmin(){
   let t=appointments.length,r=appointments.filter(a=>a.paid).reduce((s,a)=>s+a.feesNum,0);
   document.getElementById('totalApps').innerText=t;
   document.getElementById('totalRevenue').innerText="₹"+r;
-  let sHTML=doctors.map((d,i)=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee"><div><b style="font-size:11px">${d.name}</b> <small style="font-size:8px">${d.age}, ${d.exp}</small><br>${getStatus(d.status)}</div><select onchange="changeStatus(${i},this.value)" style="width:70px"><option value="yes" ${d.status=='yes'?'selected':''}>YES</option><option value="no" ${d.status=='no'?'selected':''}>NO</option></select></div>`).join('');
+  let sHTML=doctors.map((d,i)=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee"><div><b style="font-size:11px">${cleanName(d.name)}</b> <small style="font-size:8px">${d.age}, ${d.exp}</small><br>${getStatus(d.status)}</div><select onchange="changeStatus(${i},this.value)" style="width:70px"><option value="yes" ${d.status=='yes'?'selected':''}>YES</option><option value="no" ${d.status=='no'?'selected':''}>NO</option></select></div>`).join('');
   document.getElementById('doctorStatusControl').innerHTML=sHTML;
   let h=`<table style="width:100%;background:#fff;border-radius:8px;overflow:hidden;font-size:11px"><tr style="background:#6a5af9;color:#fff"><td style="padding:6px">Patient</td><td style="padding:6px">Token</td><td style="padding:6px">Act</td></tr>`;
-  appointments.slice().reverse().forEach((a,idx)=>{let ri=appointments.length-1-idx;h+=`<tr><td style="padding:6px">${a.name}<br><small>${a.docName}</small></td><td style="padding:6px">${a.token}</td><td style="padding:6px"><button onclick="openRx(${ri})" style="padding:3px 6px;background:green;color:#fff;border:none;border-radius:4px">Rx</button> <button onclick="del(${ri})" style="padding:3px 6px;background:red;color:#fff;border:none;border-radius:4px">DEL</button></td></tr>`;});
+  appointments.slice().reverse().forEach((a,idx)=>{let ri=appointments.length-1-idx;h+=`<tr><td style="padding:6px">${a.name}<br><small>${cleanName(a.docName)}</small></td><td style="padding:6px">${a.token}</td><td style="padding:6px"><button onclick="openRx(${ri})" style="padding:3px 6px;background:green;color:#fff;border:none;border-radius:4px">Rx</button> <button onclick="del(${ri})" style="padding:3px 6px;background:red;color:#fff;border:none;border-radius:4px">DEL</button></td></tr>`;});
   h+=`</table>`;document.getElementById('adminTableContainer').innerHTML=h;
   let labH=`<table style="width:100%;background:#fff;border-radius:8px;overflow:hidden;font-size:11px"><tr style="background:orange;color:#fff"><td style="padding:6px">Patient</td><td style="padding:6px">Test</td><td style="padding:6px">DEL</td></tr>`;
   labBookings.slice().reverse().forEach((l,idx)=>{let ri=labBookings.length-1-idx;labH+=`<tr><td style="padding:6px">${l.name}<br><small>${l.mobile}</small></td><td style="padding:6px">${l.testName} ${l.price}</td><td style="padding:6px"><button onclick="delLab(${ri})" style="padding:3px 6px;background:red;color:#fff;border:none;border-radius:4px">DEL</button></td></tr>`;});
@@ -123,7 +124,7 @@ function savePrescription(){
   let adv=document.getElementById('rxAdvice').value;
   let fol=document.getElementById('rxFollowup').value;
   if(!diag||!meds)return alert("Diagnosis+Medicines likho");
-  let rx={token:a.token,name:a.name,mobile:a.mobile,docName:a.docName,date:new Date().toLocaleDateString(),diagnosis:diag,medicines:meds,advice:adv,followup:fol};
+  let rx={token:a.token,name:a.name,mobile:a.mobile,docName:cleanName(a.docName),date:new Date().toLocaleDateString(),diagnosis:diag,medicines:meds,advice:adv,followup:fol};
   let ex=prescriptions.findIndex(p=>p.token==a.token);
   if(ex>=0)prescriptions[ex]=rx;else prescriptions.push(rx);
   localStorage.setItem('yadav_prescriptions',JSON.stringify(prescriptions));
@@ -132,7 +133,7 @@ function savePrescription(){
 function renderHistory(){
   let my=appointments.filter(a=>a.mobile==patientData.mobile),box=document.getElementById('historyContainer');
   if(my.length==0){box.innerHTML='<p style="padding:0 10px;color:gray;font-size:10px">No appointment</p>';return;}
-  box.innerHTML=my.reverse().map(a=>{let oi=appointments.findIndex(x=>x.token===a.token);return `<div class="history-card"><div><b style="font-size:10px">${a.docName}</b><br><small>${a.date} ${a.time} | ${a.token}</small></div><button onclick="viewSlip(${oi})" style="padding:5px 8px;background:#6a5af9;color:#fff;border:none;border-radius:5px;font-size:9px">Slip</button></div>`;}).join('');
+  box.innerHTML=my.reverse().map(a=>{let oi=appointments.findIndex(x=>x.token===a.token);return `<div class="history-card"><div><b style="font-size:10px">${cleanName(a.docName)}</b><br><small>${a.date} ${a.time} | ${a.token}</small></div><button onclick="viewSlip(${oi})" style="padding:5px 8px;background:#6a5af9;color:#fff;border:none;border-radius:5px;font-size:9px">Slip</button></div>`;}).join('');
 }
 function renderLabHistory(){
   let myLab=labBookings.filter(l=>l.mobile==patientData.mobile);
@@ -147,7 +148,7 @@ function renderMedicalHistory(){
   let html=`<div style="background:#fff;border-radius:10px;margin:0 8px;padding:8px">`;
   myRx.reverse().forEach(rx=>{
     let ri=prescriptions.findIndex(p=>p.token==rx.token);
-    html+=`<div style="border:1px solid #10b981;border-radius:6px;padding:6px;margin:5px 0;display:flex;justify-content:space-between"><div><b style="font-size:11px">💊 ${rx.docName}</b><br><small style="font-size:9px">${rx.date} | ${rx.diagnosis}</small></div><button onclick="viewPrescription(${ri})" style="padding:5px 8px;background:#10b981;color:#fff;border:none;border-radius:4px;font-size:9px">Dekho</button></div>`;
+    html+=`<div style="border:1px solid #10b981;border-radius:6px;padding:6px;margin:5px 0;display:flex;justify-content:space-between"><div><b style="font-size:11px">💊 ${cleanName(rx.docName)}</b><br><small style="font-size:9px">${rx.date} | ${rx.diagnosis}</small></div><button onclick="viewPrescription(${ri})" style="padding:5px 8px;background:#10b981;color:#fff;border:none;border-radius:4px;font-size:9px">Dekho</button></div>`;
   });
   html+=`</div>`;box.innerHTML=html;
 }
@@ -156,7 +157,7 @@ function viewPrescription(i){
   document.getElementById('pDate').innerText=rx.date;
   document.getElementById('pToken').innerText=rx.token;
   document.getElementById('pName').innerText=rx.name;
-  document.getElementById('pDoc').innerText=rx.docName;
+  document.getElementById('pDoc').innerText=cleanName(rx.docName);
   document.getElementById('pDiagnosis').innerText=rx.diagnosis;
   document.getElementById('pMedicines').innerText=rx.medicines;
   document.getElementById('pAdvice').innerText=rx.advice;
@@ -167,7 +168,7 @@ function viewPrescription(i){
 }
 function openBook(i){
   selectedDoctor=doctors[i];
-  document.getElementById('modalDocName').innerText=selectedDoctor.name;
+  document.getElementById('modalDocName').innerText=cleanName(selectedDoctor.name);
   document.getElementById('modalDept').innerText=selectedDoctor.dept+" - "+selectedDoctor.fees;
   document.getElementById('modalAgeExp').innerText=selectedDoctor.age+" | "+selectedDoctor.exp;
   document.getElementById('modalStatus').innerHTML=getStatus(selectedDoctor.status);
@@ -192,7 +193,7 @@ function confirmBooking(){
   let d=document.getElementById('bookDate').value,t=document.getElementById('bookTime').value,p=document.getElementById('bookProblem').value||'Checkup';
   if(!d||!t)return alert('Date Time');
   let token='YHC'+Math.floor(1000+Math.random()*9000);
-  let na={name:patientData.name,mobile:patientData.mobile,docName:selectedDoctor.name,dept:selectedDoctor.dept,fees:selectedDoctor.fees,feesNum:selectedDoctor.feesNum,age:selectedDoctor.age,exp:selectedDoctor.exp,date:d,time:t,problem:p,token:token,paid:false};
+  let na={name:patientData.name,mobile:patientData.mobile,docName:cleanName(selectedDoctor.name),dept:selectedDoctor.dept,fees:selectedDoctor.fees,feesNum:selectedDoctor.feesNum,age:selectedDoctor.age,exp:selectedDoctor.exp,date:d,time:t,problem:p,token:token,paid:false};
   appointments.push(na);
   localStorage.setItem('yadav_appointments',JSON.stringify(appointments));
   showSlip(na,appointments.length-1);
@@ -204,7 +205,7 @@ function showSlip(a,i){
   document.getElementById('slipPrintTime').innerText=new Date().toLocaleTimeString();
   document.getElementById('sName').innerText=a.name;
   document.getElementById('sMobile').innerText=a.mobile;
-  document.getElementById('sDoc').innerText=a.docName;
+  document.getElementById('sDoc').innerText=cleanName(a.docName);
   document.getElementById('sAgeExp').innerText=(a.age||'')+" | "+(a.exp||'');
   document.getElementById('sDept').innerText=a.dept;
   document.getElementById('sFees').innerText=a.fees;
@@ -230,7 +231,7 @@ function payNow(){
 }
 function shareWhatsApp(){
   let a=appointments[currentAppIndex];
-  window.open(`https://wa.me/?text=${encodeURIComponent("YADAV HEALTH CENTER "+a.name+" "+a.docName+" "+a.token)}`,'_blank');
+  window.open(`https://wa.me/?text=${encodeURIComponent("YADAV HEALTH CENTER "+a.name+" "+cleanName(a.docName)+" "+a.token)}`,'_blank');
 }
 function downloadSlip(){
   let c=document.getElementById('slipContent').innerHTML;
