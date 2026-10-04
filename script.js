@@ -3,7 +3,7 @@ function hide(id){
 }
 
 function cleanName(n){
-  return n.replace(/^(Dr\.\s*)+/gi,' ').trim();
+  return n.replace(/^(Dr\.\s*)+/gi,' Dr.').trim();
 }
 const UPI="9520933721@ptyes";
 const _0xA1="QXZhbmlzaCBZYWRhdg==";
